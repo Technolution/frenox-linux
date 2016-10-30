@@ -1,0 +1,7 @@
+[submodule "riscv-linux"]
+	path = riscv-linux
+	url = ../riscv-linux
+	branch = priv-1.9
+[submodule "riscv-pk"]
+	path = riscv-pk
+	url = ../riscv-pk
