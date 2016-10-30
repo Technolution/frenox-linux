@@ -62,7 +62,7 @@ build/sub-update: build/
 build/:
 	mkdir $@
 
-riscv-linux/Makefile:
+riscv-linux/Makefile: build/sub-update
 	cd riscv-linux && (cat $(LINUX_FILE) || /usr/bin/curl -L $(LINUX_URL)) | tar -xJ --strip-components=1
 	cd riscv-linux && git checkout .
 	touch $@
