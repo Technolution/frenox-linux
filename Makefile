@@ -75,4 +75,31 @@ build/riscv-pk/Makefile: build/sub-update
 build/riscv-pk/bbl: build/riscv-pk/Makefile vmlinux
 	make -C $(@D) bbl
 	
+###############################################################################
+## rules used to export repos
+###############################################################################
+## by calling 
+##    make repo-export
+## an build/export directory is created containing all git archive used by this
+## archive and its submodules. This can be used to 'archive' this repos and
+## its dependencies easiely
+###############################################################################
+REPO_URLS = $(shell git submodule foreach --recursive 'git config --get remote.origin.url' | grep http)
+REPO_URLS += $(shell git config --get remote.origin.url)
 
+show-repos: build/sub-update
+	@echo $(REPOS)
+
+build/export/: build/
+	mkdir -p $@
+
+define repo_export_template
+build/export/$(1).git: build/export/
+	cd build/export && git clone --bare $(2)
+
+REPOS += build/export/$(1).git
+endef
+
+$(foreach url, $(REPO_URLS), $(eval $(call repo_export_template,$(strip $(basename $(notdir $(url)))), $(url))))
+
+repo-export: $(REPOS) build/sub-update
