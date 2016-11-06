@@ -1,0 +1,26 @@
+#!/bin/busybox ash
+
+#install all simlinks
+/bin/busybox --install -s
+
+#Mount things needed by this script
+mount -t proc proc /proc
+#mount -t sysfs sysfs /sys
+
+#Create all the symlinks to /bin/busybox
+
+echo " ____  ____  ____  _  _  _____  _  _ ";
+echo "( ___)(  _ \( ___)( \( )(  _  )( \/ )";
+echo " )__)  )   / )__)  )  (  )(_)(  )  ( ";
+echo "(__)  (_)\_)(____)(_)\_)(_____)(_/\_)";
+echo "    Software wants to run secure!    ";
+
+ls -al /
+echo ""
+ls -al /bin
+echo ""
+ls -al /dev
+
+
+/bin/busybox ash
+

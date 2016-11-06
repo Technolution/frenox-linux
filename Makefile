@@ -19,7 +19,7 @@
 ## This is a meta makefile to initialize the build environment for linux.
 ###############################################################################
 
-ENVIRONMENTS	:= risc-v
+ENVIRONMENTS	:= riscv-tools
 TL_ENV			?= true
 
 LINUX_DISTRO	:= linux-4.6.2.tar.xz
@@ -27,12 +27,10 @@ CACHE_DIR 		:= /var/cache/
 LINUX_FILE		:= $(abspath $(strip $(CACHE_DIR))/$(LINUX_DISTRO))
 LINUX_URL		:= https://cdn.kernel.org/pub/linux/kernel/v4.x/$(LINUX_DISTRO)
 
-
-
 ###############################################################################
 ## phony rules
 ###############################################################################
-.PHONY: all sub-update init-kernel bbl vmlinux defconfig menuconfig clean
+.PHONY: all sub-update init-kernel bbl vmlinux defconfig menuconfig clean spike ramfs
 
 all: bbl
 
@@ -40,22 +38,30 @@ sub-update: build/sub-update
 init-kernel: riscv-linux/Makefile
 bbl: build/riscv-pk/bbl
 
-vmlinux: riscv-linux/Makefile
-	$(TL_ENV) {$(ENVIRONMENTS)} && $(MAKE) -C riscv-linux ARCH=riscv vmlinux
+vmlinux: riscv-linux/Makefile build/frenox-initramfs.cpio
+	$(TL_ENV) $(ENVIRONMENTS) && $(MAKE) -C riscv-linux ARCH=riscv vmlinux
 
 defconfig: riscv-linux/Makefile
-	$(TL_ENV) {$(ENVIRONMENTS)} && $(MAKE) -C riscv-linux ARCH=riscv defconfig
+	$(TL_ENV) $(ENVIRONMENTS) && $(MAKE) -C riscv-linux ARCH=riscv defconfig
 
 menuconfig: riscv-linux/Makefile
-	$(TL_ENV) {$(ENVIRONMENTS)} && $(MAKE) -C riscv-linux ARCH=riscv menuconfig
+	$(TL_ENV) $(ENVIRONMENTS) && $(MAKE) -C riscv-linux ARCH=riscv menuconfig
+
+ramfs: 
+	$(TL_ENV) $(ENVIRONMENTS) && $(MAKE) -C frenox-ramfs
+
+spike: build/riscv-pk/bbl
+	$(TL_ENV) $(ENVIRONMENTS) && spike $<
 
 clean:
 	rm -rf build
 
 ###############################################################################
-## build rules
+## build rules linux and bbl
 ###############################################################################
-build/sub-update: build/
+.PRECIOUS: build/sub-update riscv-linux/Makefile build/riscv-pk/Makefile
+
+build/sub-update: | build/
 	git submodule update --init --recursive
 	touch $@
 
@@ -73,8 +79,8 @@ build/riscv-pk/Makefile: build/sub-update
 		--enable-32bit --with-payload=../../riscv-linux/vmlinux
 
 build/riscv-pk/bbl: build/riscv-pk/Makefile vmlinux
-	make -C $(@D) bbl
-	
+	$(TL_ENV) $(ENVIRONMENTS) && make -C $(@D) bbl
+
 ###############################################################################
 ## rules used to export repos
 ###############################################################################
@@ -90,7 +96,7 @@ REPO_URLS += $(shell git config --get remote.origin.url)
 show-repos: build/sub-update
 	@echo $(REPOS)
 
-build/export/: build/
+build/export/: | build/
 	mkdir -p $@
 
 define repo_export_template
@@ -103,3 +109,4 @@ endef
 $(foreach url, $(REPO_URLS), $(eval $(call repo_export_template,$(strip $(basename $(notdir $(url)))), $(url))))
 
 repo-export: $(REPOS) build/sub-update
+
