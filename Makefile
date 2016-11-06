@@ -19,7 +19,7 @@
 ## This is a meta makefile to initialize the build environment for linux.
 ###############################################################################
 
-ENVIRONMENTS	:= risc-v
+ENVIRONMENTS	:= riscv-tools
 TL_ENV			?= true
 
 LINUX_DISTRO	:= linux-4.6.2.tar.xz
@@ -41,13 +41,13 @@ init-kernel: riscv-linux/Makefile
 bbl: build/riscv-pk/bbl
 
 vmlinux: riscv-linux/Makefile
-	$(TL_ENV) {$(ENVIRONMENTS)} && $(MAKE) -C riscv-linux ARCH=riscv vmlinux
+	$(TL_ENV) $(ENVIRONMENTS) && $(MAKE) -C riscv-linux ARCH=riscv vmlinux
 
 defconfig: riscv-linux/Makefile
-	$(TL_ENV) {$(ENVIRONMENTS)} && $(MAKE) -C riscv-linux ARCH=riscv defconfig
+	$(TL_ENV) $(ENVIRONMENTS) && $(MAKE) -C riscv-linux ARCH=riscv defconfig
 
 menuconfig: riscv-linux/Makefile
-	$(TL_ENV) {$(ENVIRONMENTS)} && $(MAKE) -C riscv-linux ARCH=riscv menuconfig
+	$(TL_ENV) $(ENVIRONMENTS) && $(MAKE) -C riscv-linux ARCH=riscv menuconfig
 
 clean:
 	rm -rf build
@@ -69,7 +69,7 @@ riscv-linux/Makefile: build/sub-update
 
 build/riscv-pk/Makefile: build/sub-update
 	mkdir -p $(@D)
-	cd $(@D) && $(TL_ENV) {$(ENVIRONMENTS)} && ../../riscv-pk/configure --prefix=$(PREFIX) --host=riscv32-unknown-elf \
+	cd $(@D) && $(TL_ENV) $(ENVIRONMENTS) && ../../riscv-pk/configure --prefix=$(PREFIX) --host=riscv32-unknown-elf \
 		--enable-32bit --with-payload=../../riscv-linux/vmlinux
 
 build/riscv-pk/bbl: build/riscv-pk/Makefile vmlinux
