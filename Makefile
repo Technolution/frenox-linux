@@ -75,7 +75,7 @@ riscv-linux/Makefile: build/sub-update
 
 build/riscv-pk/Makefile: build/sub-update
 	mkdir -p $(@D)
-	cd $(@D) && $(TL_ENV) {$(ENVIRONMENTS)} && ../../riscv-pk/configure --prefix=$(PREFIX) --host=riscv32-unknown-elf \
+	cd $(@D) && $(TL_ENV) $(ENVIRONMENTS) && ../../riscv-pk/configure --prefix=$(PREFIX) --host=riscv32-unknown-elf \
 		--enable-32bit --with-payload=../../riscv-linux/vmlinux
 
 build/riscv-pk/bbl: build/riscv-pk/Makefile vmlinux
