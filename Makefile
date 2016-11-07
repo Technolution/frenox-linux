@@ -38,7 +38,7 @@ sub-update: build/sub-update
 init-kernel: riscv-linux/Makefile
 bbl: build/riscv-pk/bbl
 
-vmlinux: riscv-linux/Makefile build/frenox-initramfs.cpio
+vmlinux: riscv-linux/Makefile ramfs
 	$(TL_ENV) $(ENVIRONMENTS) && $(MAKE) -C riscv-linux ARCH=riscv vmlinux
 
 defconfig: riscv-linux/Makefile
@@ -47,7 +47,7 @@ defconfig: riscv-linux/Makefile
 menuconfig: riscv-linux/Makefile
 	$(TL_ENV) $(ENVIRONMENTS) && $(MAKE) -C riscv-linux ARCH=riscv menuconfig
 
-ramfs: 
+ramfs:
 	$(TL_ENV) $(ENVIRONMENTS) && $(MAKE) -C frenox-ramfs
 
 spike: build/riscv-pk/bbl

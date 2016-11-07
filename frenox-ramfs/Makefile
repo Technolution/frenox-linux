@@ -47,11 +47,9 @@ clean:
 ## the initramfs is build or updated
 ###############################################################################
 DEFAULT_DIRS = bin dev etc lib mnt proc root sbin sys tmp usr
-DEFAULT_DEVS = dev/console
-RAMFS_ITEMS = $(shell find initramfs/ ! -type l)
 
+RAMFS_ITEMS = $(shell find initramfs/ ! -type l)
 RAMFS_DIRS = $(DEFAULT_DIRS:%=initramfs/%)
-RAMFS_DEVS = $(DEFAULT_DEVS:%=initramfs/%)
 
 build/:
 	mkdir -p $@
@@ -61,16 +59,14 @@ itest::
 	@echo $(RAMFS_ITEMS)
 
 
-build/$(ROOT_IMG):  $(RAMFS_ITEMS) $(RAMFS_DIRS) $(RAMFS_DEVS) busybox | build/
+build/$(ROOT_IMG):  $(RAMFS_ITEMS) $(RAMFS_DIRS) busybox | build/
+	echo Created on `date` > initramfs/etc/dist-date
 	cd initramfs && fakeroot sh -c 'find . -print0 | cpio --null -ov --format=newc' > ../$@
 
 $(RAMFS_DIRS):
 	mkdir -p $@
 
-initramfs/dev/console:
-	mknod $@ c 5 1
 
-	
 ###############################################################################
 ## busybox
 ###############################################################################
@@ -83,7 +79,10 @@ busybox: initramfs/bin/busybox
 initramfs/bin/busybox: busybox/busybox
 	cp $< $@
 
-busybox/busybox: busybox/Makefile
+# build busybox, note we assume we will only be hacking the .config file of
+# busybox and not the sources. BTW these sources are not under version control
+# of this archive.
+busybox/busybox: busybox/Makefile busybox/.config
 	$(TL_ENV) $(ENVIRONMENTS) && $(MAKE) -C busybox
 
 busybox/Makefile: 
