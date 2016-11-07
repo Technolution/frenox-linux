@@ -2,6 +2,9 @@
 	path = riscv-linux
 	url = ../riscv-linux
 	branch = priv-1.9
+	shallow = true
+
 [submodule "riscv-pk"]
 	path = riscv-pk
 	url = ../riscv-pk
+	shallow = true
