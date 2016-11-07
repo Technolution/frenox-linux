@@ -1,3 +1,4 @@
+.project
 /build/
 frenox-ramfs/build
 frenox-ramfs/busybox/*
