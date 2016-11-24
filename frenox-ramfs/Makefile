@@ -46,7 +46,7 @@ clean:
 ##    make ramfs
 ## the initramfs is build or updated
 ###############################################################################
-DEFAULT_DIRS = bin dev etc lib mnt proc root sbin sys tmp usr
+DEFAULT_DIRS = bin sbin dev etc lib mnt proc root sbin sys tmp usr usr/bin usr/lib usr/sbin
 
 RAMFS_ITEMS = $(shell find initramfs/ ! -type l)
 RAMFS_DIRS = $(DEFAULT_DIRS:%=initramfs/%)
