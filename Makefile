@@ -22,15 +22,21 @@
 ENVIRONMENTS	:= riscv-tools
 TL_ENV			?= true
 
-LINUX_DISTRO	:= linux-4.6.2.tar.xz
 CACHE_DIR 		:= /var/cache/
+
+LINUX_DISTRO	:= linux-4.6.2.tar.xz
 LINUX_FILE		:= $(abspath $(strip $(CACHE_DIR))/$(LINUX_DISTRO))
 LINUX_URL		:= https://cdn.kernel.org/pub/linux/kernel/v4.x/$(LINUX_DISTRO)
+
+BR2_DISTRO		:= buildroot-2016.11.tar.bz2
+BR2_FILE		:= $(abspath $(strip $(CACHE_DIR))/$(BR2_DISTRO))
+BR2_URL			:= https://buildroot.org/downloads/$(BR2_DISTRO)
+
 
 ###############################################################################
 ## phony rules
 ###############################################################################
-.PHONY: all sub-update init-kernel bbl vmlinux defconfig menuconfig clean spike ramfs
+.PHONY: all sub-update init-kernel bbl vmlinux defconfig menuconfig clean spike buildroot
 
 all: bbl
 
@@ -38,7 +44,7 @@ sub-update: build/sub-update
 init-kernel: riscv-linux/Makefile
 bbl: build/riscv-pk/bbl
 
-vmlinux: riscv-linux/Makefile ramfs
+vmlinux: riscv-linux/Makefile buildroot
 	$(TL_ENV) $(ENVIRONMENTS) && $(MAKE) -C riscv-linux ARCH=riscv vmlinux
 
 defconfig: riscv-linux/Makefile
@@ -47,8 +53,8 @@ defconfig: riscv-linux/Makefile
 menuconfig: riscv-linux/Makefile
 	$(TL_ENV) $(ENVIRONMENTS) && $(MAKE) -C riscv-linux ARCH=riscv menuconfig
 
-ramfs:
-	$(TL_ENV) $(ENVIRONMENTS) && $(MAKE) -C frenox-ramfs
+buildroot: frenox-buildroot/Makefile
+	$(TL_ENV) $(ENVIRONMENTS) && $(MAKE) -C frenox-buildroot
 
 spike: build/riscv-pk/bbl
 	$(TL_ENV) $(ENVIRONMENTS) && spike $<
@@ -59,7 +65,7 @@ clean:
 ###############################################################################
 ## build rules linux and bbl
 ###############################################################################
-.PRECIOUS: build/sub-update riscv-linux/Makefile build/riscv-pk/Makefile
+.PRECIOUS: build/sub-update riscv-linux/Makefile build/riscv-pk/Makefile frenox-buildroot/Makefile
 
 build/sub-update: | build/
 	git submodule update --init --recursive
@@ -71,6 +77,11 @@ build/:
 riscv-linux/Makefile: build/sub-update
 	cd riscv-linux && (cat $(LINUX_FILE) || /usr/bin/curl -L $(LINUX_URL)) | tar -xJ --strip-components=1
 	cd riscv-linux && git checkout .
+	touch $@
+
+frenox-buildroot/Makefile:
+	cd frenox-buildroot && (cat $(BR2_FILE) || /usr/bin/curl -L $(BR2_URL)) | tar -xj --strip-components=1
+	cd frenox-buildroot && git checkout .
 	touch $@
 
 build/riscv-pk/Makefile: build/sub-update
