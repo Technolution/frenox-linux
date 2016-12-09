@@ -17,12 +17,6 @@ echo " )__)  )   / )__)  )  (  )(_)(  )  ( ";
 echo "(__)  (_)\_)(____)(_)\_)(_____)(_/\_)";
 echo "    Software wants to run secure!    ";
 echo ""
-ls -al /
-echo ""
-ls -al /bin
-echo ""
-ls -al /dev
-
 
 /bin/busybox ash
 
