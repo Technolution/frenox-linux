@@ -79,7 +79,7 @@ riscv-linux/Makefile: build/sub-update
 	cd riscv-linux && git checkout .
 	touch $@
 
-frenox-buildroot/Makefile:
+frenox-buildroot/Makefile: build/sub-update
 	cd frenox-buildroot && (cat $(BR2_FILE) || /usr/bin/curl -L $(BR2_URL)) | tar -xj --strip-components=1
 	cd frenox-buildroot && git checkout .
 	touch $@
