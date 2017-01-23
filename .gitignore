@@ -5,3 +5,4 @@ frenox-ramfs/busybox/*
 frenox-ramfs/busybox/.*
 frenox-ramfs/busybox/.gitignore
 !frenox-ramfs/busybox/.config
+**.pyc

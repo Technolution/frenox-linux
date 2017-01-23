@@ -21,6 +21,10 @@
 
 ENVIRONMENTS	:= riscv-tools
 TL_ENV			?= true
+CCPREFIX		?= riscv32-unknown-elf-
+OBJCOPY			:= $(CCPREFIX)objcopy
+SIZE			:= $(CCPREFIX)size
+RAM_START		:= 0x80000000
 
 CACHE_DIR 		:= /var/cache/
 
@@ -36,13 +40,14 @@ BR2_URL			:= https://buildroot.org/downloads/$(BR2_DISTRO)
 ###############################################################################
 ## phony rules
 ###############################################################################
-.PHONY: all sub-update init-kernel bbl vmlinux defconfig menuconfig clean spike buildroot
+.PHONY: all sub-update init-kernel bbl bbl.hex vmlinux defconfig menuconfig clean spike buildroot
 
-all: bbl
+all: bbl.hex
 
 sub-update: build/sub-update
 init-kernel: riscv-linux/Makefile
 bbl: build/riscv-pk/bbl
+bbl.hex: build/bbl.hex
 
 vmlinux: riscv-linux/Makefile buildroot
 	$(TL_ENV) $(ENVIRONMENTS) && $(MAKE) -C riscv-linux ARCH=riscv vmlinux
@@ -91,6 +96,11 @@ build/riscv-pk/Makefile: build/sub-update
 
 build/riscv-pk/bbl: build/riscv-pk/Makefile vmlinux
 	$(TL_ENV) $(ENVIRONMENTS) && make -C $(@D) bbl
+
+build/bbl.hex: build/riscv-pk/bbl
+	$(TL_ENV) $(ENVIRONMENTS) && $(OBJCOPY) --change-addresses=-$(RAM_START) --input-target srec --output-target ihex $< $@
+	$(TL_ENV) $(ENVIRONMENTS) && export SIZE=$(SIZE) && ./addbss.py $< $@ $(RAM_START)
+
 
 ###############################################################################
 ## rules used to export repos
