@@ -80,11 +80,13 @@ build/:
 	mkdir $@
 
 riscv-linux/Makefile: build/sub-update
+	cd riscv-linux && git diff --quiet
 	cd riscv-linux && (cat $(LINUX_FILE) || /usr/bin/curl -L $(LINUX_URL)) | tar -xJ --strip-components=1
 	cd riscv-linux && git checkout .
 	touch $@
 
 frenox-buildroot/Makefile: build/sub-update
+	cd frenox-buildroot && git diff --quiet
 	cd frenox-buildroot && (cat $(BR2_FILE) || /usr/bin/curl -L $(BR2_URL)) | tar -xj --strip-components=1
 	cd frenox-buildroot && git checkout .
 	touch $@
