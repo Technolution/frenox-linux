@@ -100,8 +100,7 @@ build/riscv-pk/bbl: build/riscv-pk/Makefile vmlinux
 	$(TL_ENV) $(ENVIRONMENTS) && make -C $(@D) bbl
 
 build/bbl.hex: build/riscv-pk/bbl
-	$(TL_ENV) $(ENVIRONMENTS) && $(OBJCOPY) --change-addresses=-$(RAM_START) --input-target srec --output-target ihex $< $@
-	$(TL_ENV) $(ENVIRONMENTS) && export SIZE=$(SIZE) && ./addbss.py $< $@ $(RAM_START)
+	$(TL_ENV) $(ENVIRONMENTS) && $(OBJCOPY) --change-addresses=-$(RAM_START) --set-section-flags .bss=alloc,load,contents --input-target srec --output-target ihex $< $@
 
 
 ###############################################################################
