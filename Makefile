@@ -42,12 +42,13 @@ BR2_URL			:= https://buildroot.org/downloads/$(BR2_DISTRO)
 ###############################################################################
 .PHONY: all sub-update init-kernel bbl bbl.hex vmlinux defconfig menuconfig clean spike buildroot
 
-all: bbl.hex
+all: bbl.hex bbl.bin
 
 sub-update: build/sub-update
 init-kernel: riscv-linux/Makefile
 bbl: build/riscv-pk/bbl
 bbl.hex: build/bbl.hex
+bbl.bin: build/bbl.bin
 
 vmlinux: riscv-linux/Makefile buildroot
 	$(TL_ENV) $(ENVIRONMENTS) && $(MAKE) -C riscv-linux ARCH=riscv vmlinux
@@ -101,6 +102,9 @@ build/riscv-pk/bbl: build/riscv-pk/Makefile vmlinux
 
 build/bbl.hex: build/riscv-pk/bbl
 	$(TL_ENV) $(ENVIRONMENTS) && $(OBJCOPY) --change-addresses=-$(RAM_START) --set-section-flags .bss=alloc,load,contents --input-target srec --output-target ihex $< $@
+
+build/bbl.bin: build/riscv-pk/bbl
+	$(TL_ENV) $(ENVIRONMENTS) && $(OBJCOPY) --change-addresses=-$(RAM_START) --set-section-flags .bss=alloc,load,contents --input-target srec --output-target binary $< $@
 
 
 ###############################################################################
