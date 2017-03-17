@@ -10,4 +10,4 @@
 	shallow = true
 [submodule "frenox-buildroot"]
 	path = frenox-buildroot
-	url = ssh://git@bitbucket:7999/fren/buildroot.git
+	url = ../frenox-buildroot
